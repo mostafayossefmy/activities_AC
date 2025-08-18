@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>مطابقة الحروف بالصورة</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        
+        .activity-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            max-height: 800px;
+            background: url('images/bg_b.png') center/cover no-repeat;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            z-index: 10;
+        }
+
+        .activity-title-box {
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .match-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 90%;
+            max-width: 800px;
+        }
+        
+        .result-icon {
+            width: 100px;
+            height: 100px;
+            display: none;
+        }
+        
+        .image-box {
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .image-box img {
+            max-width: 160px;
+            max-height: 160px;
+            border-radius: 15px;
+        }
+        
+        .drop-zone {
+            width: 120px;
+            height: 120px;
+            border: 3px dashed #30336b;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: rgba(255,255,255,0.7);
+        }
+        
+        .letters {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 15px;
+            width: 90%;
+            max-width: 700px;
+            justify-content: center;
+            direction: rtl;
+        }
+        
+        .letter {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: grab;
+            font-family: 'Arial', sans-serif;
+            transition: transform 0.2s ease;
+        }
+
+        .letter:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+        
+        .dropped-letter {
+            width: 90px !important;
+            height: 90px !important;
+            background: linear-gradient(45deg, #4834d4, #686de0) !important;
+            font-size: 36px !important;
+            font-weight: bold !important;
+            border: 3px solid white !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
+            border-radius: 20px !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="activity-container">
+        <a href="activities.html" class="home-button">
+            <img src="images/home_back.png" alt="العودة للصفحة الرئيسية">
+        </a>
+        
+        <div class="activity-title-box">مطابقة الحروف بالصورة</div>
+
+        <div class="match-area">
+            <img class="result-icon" id="resultIcon" src="">
+            <div class="image-box">
+                <img id="matchImage" src="">
+            </div>
+            <div class="drop-zone" id="dropZone">ضع الحرف هنا</div>
+        </div>
+        
+        <div class="letters" id="lettersGrid"></div>
+    </div>
+
+    <script>
+        let currentLetter = 0;
+        const arabicLetters = ['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'];
+        let isAnswered = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            showNewQuestion();
+        });
+
+        function showNewQuestion() {
+            isAnswered = false;
+            // Clear drop zone before showing new question
+            document.getElementById('dropZone').innerHTML = 'ضع الحرف هنا';
+            document.getElementById('resultIcon').style.display = 'none';
+
+            currentLetter = Math.floor(Math.random() * 28) + 1;
+            document.getElementById('matchImage').src = `images/photo${currentLetter}.png`;
+            
+            const grid = document.getElementById('lettersGrid');
+            grid.innerHTML = '';
+            
+            arabicLetters.forEach(letter => {
+                const div = document.createElement('div');
+                div.className = 'letter';
+                div.textContent = letter;
+                div.draggable = true;
+                div.addEventListener('dragstart', dragStart);
+                grid.appendChild(div);
+            });
+            
+            setupDropZone();
+        }
+
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', this.textContent);
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                if (isAnswered) return;
+
+                e.preventDefault();
+                const data = e.dataTransfer.getData('text/plain');
+                const droppedLetter = data;
+                
+                const correctLetter = arabicLetters[currentLetter - 1];
+                
+                const resultIcon = document.getElementById('resultIcon');
+                
+                if (droppedLetter === correctLetter) {
+                    isAnswered = true;
+                    
+                    const droppedElement = document.createElement('div');
+                    droppedElement.className = 'letter dropped-letter';
+                    droppedElement.textContent = droppedLetter;
+                    
+                    dropZone.innerHTML = '';
+                    dropZone.appendChild(droppedElement);
+                    
+                    resultIcon.src = 'images/right.png';
+                    resultIcon.style.display = 'block';
+                    
+                    const audio = new Audio(`sounds/ph${currentLetter}.mp3`);
+                    audio.play().catch(e => {});
+                    
+                    setTimeout(showNewQuestion, 2000);
+                } else {
+                    resultIcon.src = 'images/wrong.png';
+                    resultIcon.style.display = 'block';
+                    
+                    const audio = new Audio('sounds/wrong.mp3');
+                    audio.play().catch(e => {});
+                    
+                    setTimeout(() => {
+                        resultIcon.style.display = 'none';
+                    }, 2000);
+                }
+            });
+        }
+        
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            console.log('تم تعطيل قائمة السياق في النشاط!');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>تكوين الكلمات</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            overflow: hidden; /* لمنع ظهور شريط التمرير عند تطاير النجوم */
+        }
+
+        .activity-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh; 
+            max-height: 800px; 
+            background: url('images/bg_d.png') center/cover no-repeat;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+        }
+        
+        .home-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            z-index: 10;
+        }
+
+        .activity-title-box {
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .image-box {
+            width: 200px; 
+            height: 200px;
+            background: white;
+            border: 3px solid black;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-box img {
+            max-width: 180px;
+            max-height: 180px;
+        }
+        
+        .word-drop-zone {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px; 
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 36px; 
+            font-weight: bold;
+            direction: rtl; 
+            color: #333;
+            transition: box-shadow 0.5s ease-in-out;
+        }
+        
+        .letters-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            direction: rtl;
+        }
+        
+        .letter {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        
+        .letter:hover {
+            transform: scale(1.1);
+        }
+
+        .correct-letter-glow {
+            box-shadow: 0 0 15px #4CAF50; 
+        }
+
+        /* هذا هو تأثير التوهج المتكرر */
+        @keyframes correctGlow {
+            0% { box-shadow: 0 0 0 #4CAF50; }
+            50% { box-shadow: 0 0 30px 10px #4CAF50; }
+            100% { box-shadow: 0 0 0 #4CAF50; }
+        }
+
+        .glowing-box {
+            animation: correctGlow 1.5s ease-in-out 2; /* 1.5 ثانية، يتكرر مرتين */
+        }
+
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('images/star.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0;
+            animation: star-fly 4s forwards;
+            z-index: 10;
+        }
+
+        @keyframes star-fly {
+            0% {
+                transform: translate(0, 0) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--end-x), var(--end-y)) scale(0.1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="activity-container">
+        <a href="activities.html" class="home-button">
+            <img src="images/home_back.png" alt="العودة للصفحة الرئيسية">
+        </a>
+        
+        <div class="activity-title-box">تكوين الكلمات</div>
+
+        <div class="image-box">
+            <img id="wordImage" src="" alt="صورة الكلمة">
+        </div>
+        
+        <div class="word-drop-zone" id="wordDropZone"></div>
+
+        <div class="letters-grid" id="lettersGrid"></div>
+        
+        <audio id="correctSound" src="sounds/correct.mp3"></audio>
+        <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+        <audio id="applauseSound" src="sounds/clap.mp3"></audio>
+    </div>
+
+    <script>
+        const words = [
+            { id: 1, word: "فيل", letters: ['ف', 'ي', 'ل'] },
+            { id: 2, word: "أسد", letters: ['أ', 'س', 'د'] },
+            { id: 3, word: "قلم", letters: ['ق', 'ل', 'م'] },
+            { id: 4, word: "مركب", letters: ['م', 'ر', 'ك', 'ب'] },
+            { id: 5, word: "نمر", letters: ['ن', 'م', 'ر'] },
+            { id: 6, word: "ديك", letters: ['د', 'ي', 'ك'] },
+            { id: 7, word: "طائرة", letters: ['ط', 'ا', 'ئ', 'ر', 'ة'] },
+            { id: 8, word: "قمر", letters: ['ق', 'م', 'ر'] },
+            { id: 9, word: "سمكة", letters: ['س', 'م', 'ك', 'ة'] },
+            { id: 10, word: "فستان", letters: ['ف', 'س', 'ت', 'ا', 'ن'] },
+            { id: 11, word: "قطة", letters: ['ق', 'ط', 'ة'] }
+        ];
+
+        let currentWord = {};
+        let placedLetters = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            startNewRound();
+        });
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startNewRound() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            
+            document.getElementById('wordImage').src = `images/word_photo${currentWord.id}.png`;
+            placedLetters = [];
+            
+            const lettersGrid = document.getElementById('lettersGrid');
+            lettersGrid.innerHTML = '';
+            
+            const wordDropZone = document.getElementById('wordDropZone');
+            wordDropZone.textContent = '';
+            wordDropZone.style.boxShadow = '';
+            wordDropZone.classList.remove('glowing-box'); // إزالة تأثير التوهج السابق
+            
+            const shuffledLetters = shuffle([...currentWord.letters]);
+            
+            shuffledLetters.forEach(letter => {
+                const letterDiv = document.createElement('div');
+                letterDiv.textContent = letter;
+                letterDiv.classList.add('letter');
+                letterDiv.draggable = true;
+                letterDiv.id = `draggable-${letter}`;
+                letterDiv.addEventListener('dragstart', dragStart);
+                lettersGrid.appendChild(letterDiv);
+            });
+
+            setupDropZone();
+        }
+
+        function dragStart(event) {
+            event.dataTransfer.setData('text/plain', event.target.textContent);
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('wordDropZone');
+            dropZone.addEventListener('dragover', dragOver);
+            dropZone.addEventListener('drop', drop);
+        }
+        
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const droppedLetter = event.dataTransfer.getData('text/plain');
+            
+            const nextCorrectLetter = currentWord.letters[placedLetters.length];
+            
+            if (droppedLetter === nextCorrectLetter) {
+                placedLetters.push(droppedLetter);
+                document.getElementById('correctSound').play();
+                
+                document.getElementById('wordDropZone').textContent = placedLetters.join('');
+                
+                const draggedElement = document.getElementById(`draggable-${droppedLetter}`);
+                if (draggedElement) {
+                    draggedElement.remove();
+                }
+
+                // تأثير توهج الحرف الصحيح
+                document.getElementById('wordDropZone').style.boxShadow = '0 0 15px 5px #ffeb3b';
+                setTimeout(() => {
+                    document.getElementById('wordDropZone').style.boxShadow = '';
+                }, 500);
+
+                checkCompletion();
+                
+            } else {
+                document.getElementById('wrongSound').play();
+            }
+        }
+        
+        function checkCompletion() {
+            if (placedLetters.length === currentWord.letters.length) {
+                document.getElementById('applauseSound').play();
+                
+                const dropZone = document.getElementById('wordDropZone');
+                dropZone.classList.add('glowing-box'); // إضافة فئة التوهج
+                
+                createFlyingStars();
+                
+                setTimeout(startNewRound, 4000);
+            }
+        }
+
+        function createFlyingStars() {
+            const imageBox = document.querySelector('.image-box');
+            const numStars = 15; 
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 20 + 10;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                const startX = imageBox.offsetLeft + (imageBox.offsetWidth / 2) - (size / 2);
+                const startY = imageBox.offsetTop; 
+                
+                star.style.left = `${startX}px`;
+                star.style.top = `${startY}px`;
+
+                const endX = startX + (Math.random() - 0.5) * 400; 
+                const endY = startY - 500; 
+                
+                star.style.setProperty('--end-x', `${endX - startX}px`);
+                star.style.setProperty('--end-y', `${endY - startY}px`);
+                
+                const styleSheet = document.styleSheets[0];
+                const keyframesName = `star-fly-${i}`;
+                
+                let existingKeyframes = false;
+                for (let rule of styleSheet.cssRules) {
+                    if (rule.name === keyframesName) {
+                        existingKeyframes = true;
+                        break;
+                    }
+                }
+                
+                if (!existingKeyframes) {
+                     styleSheet.insertRule(`
+                        @keyframes ${keyframesName} {
+                            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+                            50% { opacity: 0.8; }
+                            100% { transform: translate(${endX - startX}px, ${endY - startY}px) scale(0.1); opacity: 0; }
+                        }
+                    `, styleSheet.cssRules.length);
+                }
+
+                star.style.animationName = keyframesName;
+                star.style.animationDuration = '4s';
+                star.style.animationFillMode = 'forwards';
+                
+                document.body.appendChild(star);
+                
+                setTimeout(() => {
+                    star.remove();
+                }, 4000);
+            }
+        }
+
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            console.log('تم تعطيل قائمة السياق في النشاط!');
+        });
+    </script>
+</body>
+</html>
