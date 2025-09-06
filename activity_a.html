@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <title>التعرف على الحروف العربية</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* استدعاء خط عربي مخصص (لازم يكون موجود في مجلد fonts) */
+        @font-face {
+            font-family: 'HacenAlgeriaHd'; /* اسم الخط */
+            src: url('fonts/HacenAlgeriaHd.ttf') format('truetype'); /* مسار الخط */
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* تنسيق عام للصفحة */
+        body {
+            margin: 0; 
+            padding: 0;
+            background-color: #cc99ff; /* لون خلفية الصفحة */
+            height: 100vh; /* يساوي طول الشاشة */
+            display: flex; 
+            align-items: center; /* توسيط عمودي */
+            justify-content: center; /* توسيط أفقي */
+            font-family: 'Arial', sans-serif; /* الخط الافتراضي */
+            text-align: center;
+        }
+
+        /* الحاوية الأساسية للنشاط */
+        .activity-container {
+            width: 100%; /* ياخد العرض كله */
+            max-width: 1000px; /* أقصى عرض */
+            height: 80vh; /* ياخد أغلب طول الشاشة */
+            max-height: 800px; /* أقصى ارتفاع */
+            background: #ffffff; /* خلفية بيضاء */
+            padding: 20px;
+            border-radius: 15px; /* حواف ناعمة */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* ظل */
+            position: relative; /* علشان نقدر نثبت عناصر داخله */
+            display: flex;
+            flex-direction: column; /* العناصر ترتيبها عمودي */
+            align-items: center; 
+            justify-content: space-around;
+        }
+
+        /* صورة النشاط (اللوجو في الركن) */
+        .activity-label {
+            position: absolute;   /* ثابتة داخل الحاوية */
+            top: 10px;            /* مسافة من فوق */
+            left: -45px;          /* طالعة شوية برة ناحية الشمال */
+            width: 180px;         /* عرض الصورة */
+            height: auto;         /* الطول تلقائي */
+            transform: rotate(-40deg); /* ميل الصورة */
+            border-radius: 10px;  /* حواف ناعمة */
+            padding: 5px;         /* مسافة داخلية صغيرة */
+        }
+
+        /* زر العودة (هوم) */
+        .home-button {
+            position: absolute; /* ثابت في الركن */
+            bottom: 20px; /* تحت */
+            left: 20px;   /* شمال */
+            cursor: pointer; /* شكل اليد عند المرور */
+            width: 60px;
+            height: 60px;
+            z-index: 10; /* علشان يبقى فوق باقي العناصر */
+        }
+
+        /* منطقة العرض (المربع + الصور الجانبية) */
+        .display-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 800px;
+            gap: 10px; /* مسافة بين العناصر */
+        }
+
+        /* الصور الجانبية (مخفية في البداية) */
+        .side-image {
+            width: 150px;
+            height: 150px;
+            display: none; /* مش باينة إلا لما نضغط */
+        }
+       
+        /* المربع اللي يعرض الحرف */
+        .display-box {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 12px solid #cc66ff;  /* إطار بنفسجي */
+            border-radius: 20px; /* حواف ناعمة */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* الصورة داخل المربع */
+        .display-box img {
+            max-width: 180px;
+            max-height: 180px;
+            border-radius: 15px;
+        }
+
+        /* شبكة الحروف */
+        .letters {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr); /* 10 أعمدة */
+            gap: 15px; /* مسافة بين الأزرار */
+            width: 90%;
+            max-width: 700px;
+            direction: rtl; /* من اليمين لليسار */
+            justify-content: center;
+        }
+
+        /* أزرار الحروف */
+        .letter {
+            width: 50px;
+            height: 50px;
+            background: #ff66ff; /* لون الخلفية */
+            border-radius: 15px; /* حواف ناعمة */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-family: 'HacenAlgeriaHd', sans-serif; /* استخدام الخط العربي */
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <!-- زر الرجوع للصفحة الرئيسية -->
+    <a href="activities.html" class="home-button">
+        <img src="images/home_back.png" alt="العودة للصفحة الرئيسية">
+    </a>
+
+    <!-- صورة النشاط (اللوجو في الشمال) -->
+    <img src="images/actv_1.png" alt="Activity Label" class="activity-label">
+
+    <!-- منطقة العرض (المربع في المنتصف + الصور الجانبية) -->
+    <div class="display-area">
+        <img class="side-image" id="leftImage" src="">
+        <div class="display-box" id="displayBox"></div>
+        <img class="side-image" id="rightImage" src="">
+    </div>
+
+    <!-- شبكة الحروف -->
+    <div class="letters" id="lettersGrid"></div>
+</div>
+
+<script>
+    // مصفوفة الحروف العربية
+    const arabicLetters = [
+        'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 
+        'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 
+        'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 
+        'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
+    ];
+    
+    // عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        const grid = document.getElementById('lettersGrid');
+        grid.innerHTML = ''; // تفريغ أي محتوى سابق
+        
+        // إنشاء زر لكل حرف
+        arabicLetters.forEach((letter, index) => {
+            const div = document.createElement('div'); // عنصر جديد
+            div.className = 'letter'; // إضافة كلاس للتنسيق
+            div.textContent = letter; // كتابة الحرف
+            div.onclick = () => showLetter(index + 1); // عند الضغط يعرض الحرف
+            grid.appendChild(div); // إضافته للشبكة
+        });
+    });
+
+    // دالة عرض الحرف والصور الجانبية
+    function showLetter(letterNum) {
+        const box = document.getElementById('displayBox');
+        const leftImage = document.getElementById('leftImage');
+        const rightImage = document.getElementById('rightImage');
+        
+        // عرض صورة الحرف في المربع
+        box.innerHTML = `<img src="images/letter${letterNum}.png" alt="حرف ${letterNum}">`;
+        
+        // عرض الصور الجانبية
+        leftImage.src = `images/letter${letterNum}a.png`;
+        rightImage.src = `images/letter${letterNum}b.png`;
+        leftImage.style.display = 'block';
+        rightImage.style.display = 'block';
+        
+        // تشغيل الصوت الخاص بالحرف
+        const audio = new Audio(`sounds/letter${letterNum}.mp3`);
+        audio.play().catch(e => {}); // تجاهل الخطأ لو الصوت مش موجود
+    }
+
+    // تعطيل زر الماوس اليمين (علشان الحماية)
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        console.log('تم تعطيل قائمة الكليك يمين!');
+    });
+</script>
+</body>
+</html>

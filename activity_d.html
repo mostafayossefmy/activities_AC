@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تكوين الكلمات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face {
+            font-family: 'HacenAlgeriaHd';
+            src: url('fonts/HacenAlgeriaHd.ttf') format('truetype');
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #cc99ff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'HacenAlgeriaHd', sans-serif;
+            overflow: hidden;
+        }
+        .activity-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            max-height: 800px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .home-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            z-index: 10;
+        }
+        /* صورة النشاط (اللوجو في الركن) */
+        .activity-label {
+            position: absolute;
+            top: 10px;
+            left: -45px;
+            width: 180px;
+            height: auto;
+            transform: rotate(-40deg);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .image-box {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 12px solid #cc66ff;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-box img {
+            max-width: 180px;
+            max-height: 180px;
+        }
+        .word-drop-zone {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border: 5px solid #f105f1;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 36px;
+            font-weight: bold;
+            direction: rtl;
+            color: #333;
+            transition: box-shadow 0.5s ease-in-out;
+        }
+        .letters-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            direction: rtl;
+        }
+        .letter {
+            width: 50px;
+            height: 50px;
+            background: #ff66ff;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-family: 'HacenAlgeriaHd', sans-serif;
+        }
+        .letter:hover { transform: scale(1.1); }
+        .correct-letter-glow { box-shadow: 0 0 15px #4CAF50; }
+        .glowing-box { animation: correctGlow 1.5s ease-in-out 2; }
+        @keyframes correctGlow {
+            0% { box-shadow: 0 0 0 #4CAF50; }
+            50% { box-shadow: 0 0 30px 10px #4CAF50; }
+            100% { box-shadow: 0 0 0 #4CAF50; }
+        }
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('images/star.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0;
+            animation: star-fly 4s forwards;
+            z-index: 10;
+        }
+        @keyframes star-fly {
+            0% { transform: translate(0,0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--end-x), var(--end-y)) scale(0.1); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="activity-container">
+        <!-- صورة النشاط في الركن -->
+        <img src="images/actv_4.png" class="activity-label" alt="نشاط 4">
+        <!-- زر العودة -->
+        <a href="activities.html" class="home-button">
+            <img src="images/home_back.png" alt="العودة للصفحة الرئيسية">
+        </a>
+        <!-- صندوق الصورة الرئيسية -->
+        <div class="image-box">
+            <img id="wordImage" src="" alt="صورة الكلمة">
+        </div>
+        <!-- منطقة إسقاط الحروف -->
+        <div class="word-drop-zone" id="wordDropZone"></div>
+        <!-- شبكة الحروف -->
+        <div class="letters-grid" id="lettersGrid"></div>
+        <!-- الأصوات -->
+        <audio id="correctSound" src="sounds/correct.mp3"></audio>
+        <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+        <audio id="applauseSound" src="sounds/clap.mp3"></audio>
+    </div>
+
+    <script>
+        const words = [
+            { id: 1, word: "فيل", letters: ['ف','ي','ل'] },
+            { id: 2, word: "أسد", letters: ['أ','س','د'] },
+            { id: 3, word: "قلم", letters: ['ق','ل','م'] },
+            { id: 4, word: "مركب", letters: ['م','ر','ك','ب'] },
+            { id: 5, word: "نمر", letters: ['ن','م','ر'] },
+            { id: 6, word: "ديك", letters: ['د','ي','ك'] },
+            { id: 7, word: "طائرة", letters: ['ط','ا','ئ','ر','ة'] },
+            { id: 8, word: "قمر", letters: ['ق','م','ر'] },
+            { id: 9, word: "سمكة", letters: ['س','م','ك','ة'] },
+            { id: 10, word: "فستان", letters: ['ف','س','ت','ا','ن'] },
+            { id: 11, word: "قطة", letters: ['ق','ط','ة'] }
+        ];
+
+        let currentWord = {};
+        let placedLetters = [];
+
+        document.addEventListener('DOMContentLoaded', startNewRound);
+
+        function shuffle(array){
+            for(let i=array.length-1;i>0;i--){
+                const j=Math.floor(Math.random()*(i+1));
+                [array[i],array[j]]=[array[j],array[i]];
+            }
+            return array;
+        }
+
+        function startNewRound(){
+            currentWord = words[Math.floor(Math.random()*words.length)];
+            document.getElementById('wordImage').src = `images/word_photo${currentWord.id}.png`;
+            placedLetters = [];
+            const lettersGrid = document.getElementById('lettersGrid');
+            lettersGrid.innerHTML='';
+            const wordDropZone=document.getElementById('wordDropZone');
+            wordDropZone.textContent='';
+            wordDropZone.style.boxShadow='';
+            wordDropZone.classList.remove('glowing-box');
+
+            const shuffledLetters = shuffle([...currentWord.letters]);
+            shuffledLetters.forEach(letter=>{
+                const letterDiv = document.createElement('div');
+                letterDiv.textContent=letter;
+                letterDiv.classList.add('letter');
+                letterDiv.draggable=true;
+                letterDiv.id=`draggable-${letter}-${Math.random().toString(36).substr(2,5)}`;
+                letterDiv.addEventListener('dragstart',dragStart);
+                lettersGrid.appendChild(letterDiv);
+            });
+
+            setupDropZone();
+        }
+
+        function dragStart(event){
+            event.dataTransfer.setData('text/plain', event.target.textContent);
+        }
+
+        function setupDropZone(){
+            const dropZone=document.getElementById('wordDropZone');
+            dropZone.addEventListener('dragover', dragOver);
+            dropZone.addEventListener('drop', drop);
+        }
+
+        function dragOver(event){ event.preventDefault(); }
+
+        function drop(event){
+            event.preventDefault();
+            const droppedLetter = event.dataTransfer.getData('text/plain');
+            const nextCorrectLetter = currentWord.letters[placedLetters.length];
+            if(droppedLetter===nextCorrectLetter){
+                placedLetters.push(droppedLetter);
+                document.getElementById('correctSound').play();
+                document.getElementById('wordDropZone').textContent = placedLetters.join('');
+                const allLetters=document.querySelectorAll('.letter');
+                allLetters.forEach(el=>{
+                    if(el.textContent===droppedLetter){ el.remove(); return; }
+                });
+                document.getElementById('wordDropZone').style.boxShadow='0 0 15px 5px #ffeb3b';
+                setTimeout(()=>{ document.getElementById('wordDropZone').style.boxShadow=''; },500);
+                checkCompletion();
+            } else {
+                document.getElementById('wrongSound').play();
+            }
+        }
+
+        function checkCompletion(){
+            if(placedLetters.length===currentWord.letters.length){
+                document.getElementById('applauseSound').play();
+                const dropZone=document.getElementById('wordDropZone');
+                dropZone.classList.add('glowing-box');
+                createFlyingStars();
+                setTimeout(startNewRound,4000);
+            }
+        }
+
+        function createFlyingStars(){
+            const imageBox=document.querySelector('.image-box');
+            const numStars=15;
+            for(let i=0;i<numStars;i++){
+                const star=document.createElement('div');
+                star.classList.add('star');
+                const size=Math.random()*20+10;
+                star.style.width=`${size}px`;
+                star.style.height=`${size}px`;
+                const startX=imageBox.offsetLeft+(imageBox.offsetWidth/2)-(size/2);
+                const startY=imageBox.offsetTop;
+                star.style.left=`${startX}px`;
+                star.style.top=`${startY}px`;
+                const endX=startX+(Math.random()-0.5)*400;
+                const endY=startY-500;
+                star.style.setProperty('--end-x',`${endX-startX}px`);
+                star.style.setProperty('--end-y',`${endY-startY}px`);
+                document.body.appendChild(star);
+                setTimeout(()=>{ star.remove(); },4000);
+            }
+        }
+
+        document.addEventListener('contextmenu', e=>{ e.preventDefault(); });
+    </script>
+</body>
+</html>
