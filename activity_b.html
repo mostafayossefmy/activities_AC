@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <title>مطابقة الحروف بالصورة - مع عمود جانبي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* ===== متغيرات وخط ===== */
+        :root {
+            --display-box-width: 220px;
+            --display-box-height: 220px;
+            --display-bg-size: cover;
+            --letter-size: 55px;
+            --letter-bg-size: cover;
+            --main-font-family: 'NotoSansArabic_Condensed-Bold', Arial, sans-serif;
+        }
+
+        @font-face {
+            /* تعريف الخط */
+            font-family: 'NotoSansArabic_Condensed-Bold';
+            src: url('fonts/NotoSansArabic_Condensed-Bold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ===== ستايل الصفحة العام ===== */
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('images/back_a_img.png') no-repeat center center;
+            background-size: cover;
+            font-family: var(--main-font-family);
+            direction: rtl;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== الحاوية الرئيسية (شبيهة بنشاط 1) ===== */
+        .activity-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            max-height: 800px;
+            margin: 4vh auto;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            /* العمود الجانبي + منطقة النشاط جنب بعض */
+            flex-direction: row;
+            /* العمود على اليمين */
+            overflow: visible;
+        }
+
+        /* ===== العمود الجانبي (نفس مقاسات النشاط الأول) ===== */
+        .sidebar {
+            width: 16%;
+            /* نفس نسبة النشاط الأول */
+            background: #f3e8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            /* توزيع الصفوف عمودياً */
+            padding: 15px 10px;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            box-sizing: border-box;
+        }
+
+        .sidebar .row {
+            /* صفوف داخل العمود */
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* ===== الصف 1: النجوم (الوسطى أعلى شوية) ===== */
+        .stars {
+            direction: rtl;
+            /* 👈 فرض الاتجاه من اليمين */
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .stars img {
+            width: 30px;
+            height: 30px;
+            transition: transform 0.25s ease, filter 0.25s ease;
+        }
+
+        .stars img:nth-child(2) {
+            transform: translateY(-6px);
+        }
+
+        /* رفع النجمة الوسطى جمالياً */
+
+        /* ===== الصف 2: صورة الطفل ===== */
+        .child-photo img {
+            width: 110px;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        /* ===== الصف 3: اسم الطالب (مستطيل) ===== */
+        .student-name {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .student-name p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            background: #fff;
+            border-radius: 12px;
+            padding: 6px 12px;
+            display: inline-block;
+
+            /* ✅ منع الالتفاف على سطر جديد */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* يظهر ... إذا الاسم طويل جدًا */
+        }
+
+        /* ===== الصف 4: المؤقت ===== */
+        .timer img {
+            width: 80px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        /* ===== الصف 5: التحكم (الهوم يمين - ريست يسار) ===== */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .controls .left {
+            order: 2;
+        }
+
+        /* إعادة التشغيل على اليسار */
+        .controls .right {
+            order: 1;
+        }
+
+        /* الهوم على اليمين */
+        .controls img {
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .controls img:hover {
+            transform: scale(1.08);
+        }
+
+        /* ===== منطقة النشاط (يمين العمود) ===== */
+        .activity-content {
+            width: 84%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            position: relative;
+            box-sizing: border-box;
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+        }
+
+        /* لوجو النشاط - نفس موضعه في النشاط الأصلي */
+        .activity-label {
+            position: absolute;
+            top: 10px;
+            left: -45px;
+            width: 180px;
+            transform: rotate(-40deg);
+            z-index: 5;
+        }
+
+        /* ===== منطقة المطابقة (مستعارة من النشاط الثاني) ===== */
+        .match-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .result-icon {
+            width: 100px;
+            height: 100px;
+            display: none;
+        }
+
+        .image-box {
+            width: var(--display-box-width);
+            height: var(--display-box-height);
+            background: url('images/back_img.png') no-repeat center center;
+            background-size: var(--display-bg-size);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-box img {
+            max-width: calc(var(--display-box-width) - 40px);
+            max-height: calc(var(--display-box-height) - 40px);
+            border-radius: 12px;
+        }
+
+        .drop-zone {
+            width: 150px;
+            height: 150px;
+            background: url('images/backaa_img.png') no-repeat center center;
+            background-size: contain;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drop-zone img {
+            max-width: 80px;
+            max-height: 80px;
+        }
+
+        /* شبكة الحروف */
+        .letters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-width: 635px;
+            margin-top: 10px;
+            direction: rtl;
+        }
+
+        .letter {
+            width: 50px;
+            height: 50px;
+            background: url('images/back_letter.png') no-repeat center center;
+            background-size: cover;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform .15s ease;
+            font-family: var(--main-font-family);
+        }
+
+        .letter:active {
+            transform: scale(1.05);
+            cursor: grabbing;
+        }
+
+        .dropped-letter {
+            width: 90px !important;
+            height: 90px !important;
+            background: linear-gradient(45deg, #cc66ff, #d88dfd) !important;
+            font-size: 36px !important;
+            font-weight: bold !important;
+            border: 3px solid white !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+            border-radius: 20px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="activity-container">
+        <!-- ===== العمود الجانبي (صفوف 5) ===== -->
+        <div class="sidebar">
+            <!-- الصف 1: 3 نجوم (الوسطى أعلى قليلاً) -->
+            <div class="row stars">
+                <img id="star1" src="images/star1.png" alt="نجمة 1"> <!-- نجمة 1 (أصفر مبدئياً) -->
+                <img id="star2" src="images/star2.png" alt="نجمة 2"> <!-- نجمة 2 (أوسط مرتفع) -->
+                <img id="star3" src="images/star3.png" alt="نجمة 3"> <!-- نجمة 3 -->
+            </div>
+
+            <!-- الصف 2: صورة الطفل (سيتم استبدال الصورة لاحقًا إن أردت) -->
+            <div class="row child-photo">
+                <img id="childPhoto" src="images/child_photo.png" alt="صورة الطفل">
+            </div>
+
+            <!-- الصف 3: اسم الطالب (ثنائي) -->
+            <div class="row student-name">
+                <p id="studentName">أحمد محمد</p>
+            </div>
+
+            <!-- الصف 4: المؤقت -->
+            <div class="row timer">
+                <img id="timerImage" src="images/timer.png" alt="مؤقت النشاط">
+            </div>
+
+            <!-- الصف 5: التحكم - الهوم على اليمين وإعادة التشغيل على اليسار -->
+            <div class="row controls">
+                <img class="right icon-home" src="images/home.png" alt="الرئيسية"> <!-- الهوم على اليمين -->
+                <img class="left icon-retry" src="images/retry.png" alt="إعادة التشغيل">
+                <!-- إعادة التشغيل على اليسار -->
+            </div>
+        </div>
+
+        <!-- ===== منطقة النشاط (مطابقة) ===== -->
+        <div class="activity-content">
+            <!-- لوجو النشاط -->
+            <img class="activity-label" src="images/actv_2.png" alt="Activity Label">
+
+            <!-- منطقة المطابقة -->
+            <div class="match-area">
+                <img id="resultIcon" class="result-icon" src="" alt="نتيجة"> <!-- أيقونة صح/خطأ -->
+
+
+                <div class="drop-zone" id="dropZone">
+                    <img src="images/question_img.png" alt="?" id="questionMark">
+                </div>
+                <div class="image-box">
+                    <img id="matchImage" src="" alt="الصورة المراد مطابقتها">
+                </div>
+
+
+
+
+            </div>
+
+            <!-- شبكة الحروف -->
+            <div class="letters" id="lettersGrid"></div>
+        </div>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // ✅ عرض اسم وصورة المستخدم من شاشة البيانات
+            const storedName = sessionStorage.getItem('userName');
+            const storedImage = sessionStorage.getItem('userImage');
+
+            if (storedName) {
+                document.getElementById('studentName').textContent = storedName;
+            }
+
+            if (storedImage) {
+                document.getElementById('childPhoto').src = storedImage;
+            }
+        });
+
+
+
+        /* ================== مصفوفة الحروف (ثابتة كما في النشاط الأصلي) ================== */
+        const arabicLetters = [
+            'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ',
+            'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص',
+            'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق',
+            'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'
+        ];
+
+        /* ===== متغيرات عامة ===== */
+        let currentLetter = 0;      // رقم الحرف الحالي (1..28)
+        let isAnswered = false;     // هل أجاب الطفل عن هذا السؤال
+        let correctAnswers = 0;     // عدد الإجابات الصحيحة الكلية (للتقدم)
+        const initialStarSrc = ['images/star1.png', 'images/star2.png', 'images/star3.png']; // صور النجوم الابتدائية
+
+        /* ننتظر تحميل الـ DOM ثم نهيء النشاط والربط بالعناصر */
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // الحصول على عناصر الواجهة
+            const lettersGrid = document.getElementById('lettersGrid'); // شبكة الحروف
+            const matchImage = document.getElementById('matchImage');   // صورة السؤال
+            const resultIcon = document.getElementById('resultIcon');   // أيقونة الصح/الغلط
+            const dropZone = document.getElementById('dropZone');       // منطقة الإسقاط
+            const starElems = [document.getElementById('star1'), document.getElementById('star2'), document.getElementById('star3')]; // النجوم
+            const homeBtn = document.querySelector('.icon-home');       // زر الهوم 
+            const retryBtn = document.querySelector('.icon-retry');     // زر إعادة التشغيل
+
+
+
+            // ربط أزرار التحكم
+            homeBtn.addEventListener('click', function () { // نقل للصفحة الرئيسية
+                window.location.href = 'activities.html';
+            });
+
+            retryBtn.addEventListener('click', function () { // إعادة تعيين النشاط
+                resetActivity();
+            });
+
+            // تهيئة السؤال الأول
+            showNewQuestion();
+
+            /* ===== دالة إظهار سؤال جديد ===== */
+            function showNewQuestion() {
+                isAnswered = false;
+                // إعادة وضع علامة السؤال داخل الـ dropZone
+                dropZone.innerHTML = '<img src="images/question_img.png" alt="?" id="questionMark">';
+
+                // إخفاء أيقونة النتيجة
+                resultIcon.style.display = 'none';
+
+                // اختيار حرف عشوائي (1..28)
+                currentLetter = Math.floor(Math.random() * arabicLetters.length) + 1;
+
+                // تعيين صورة السؤال (تأكد أن الصور مسماة photo1.png .. photo28.png)
+                matchImage.src = `images/photo${currentLetter}.png`;
+
+                // إعداد شبكة الحروف (تظهر كل الحروف وتصبح قابلة للسحب)
+                lettersGrid.innerHTML = ''; // مسح الشبكة القديمة
+                arabicLetters.forEach(letter => {
+                    const div = document.createElement('div');
+                    div.className = 'letter';
+                    div.textContent = letter;
+                    div.draggable = true;
+                    div.addEventListener('dragstart', dragStartHandler);
+                    lettersGrid.appendChild(div);
+                });
+
+                // إعداد حدث الإسقاط (كل مرة نعيد تعيينه للتأكد من عدم تكرار المستمعين)
+                setupDropZone();
+            }
+
+            /* ===== دالة بداية السحب ===== */
+            function dragStartHandler(e) {
+                e.dataTransfer.setData('text/plain', this.textContent);
+            }
+
+            /* ===== تجهيز الـ drop zone ===== */
+            function setupDropZone() {
+                // نلغي أي حدث سابق (لو وجد) ثم نضيف الجديد
+                dropZone.ondragover = function (e) { e.preventDefault(); };
+                dropZone.ondrop = function (e) {
+                    if (isAnswered) return; // إذا تم الإجابة فعلاً، لا نسمح بتكرار
+
+                    e.preventDefault();
+                    const data = e.dataTransfer.getData('text/plain');
+                    const droppedLetter = data;
+                    const correctLetter = arabicLetters[currentLetter - 1]; // حرف الإجابة الصحيح حسب الفهرس
+                    // إذا الإجابة صحيحة
+                    if (droppedLetter === correctLetter) {
+                        isAnswered = true;
+
+                        // إنشاء العنصر الظاهر داخل منطقة الإسقاط بمظهر جميل
+                        const droppedElement = document.createElement('div');
+                        droppedElement.className = 'dropped-letter';
+                        droppedElement.textContent = droppedLetter;
+
+                        dropZone.innerHTML = ''; // إزالة علامة السؤال
+                        dropZone.appendChild(droppedElement); // وضع الحرف المسقط
+
+                        // عرض أيقونة الصح وتشغيل صوت الحرف
+                        resultIcon.src = 'images/right.png';
+                        resultIcon.style.display = 'block';
+                        playSoundSafe(`sounds/ph${currentLetter}.mp3`);
+
+                        // تسجيل إجابة صحيحة وتحديث النجوم إذا لزم
+                        correctAnswers++;
+                        updateStarsByProgress();
+
+                        // بعد قليل نذهب للسؤال التالي تلقائيًا
+                        setTimeout(showNewQuestion, 1800);
+
+                    } else {
+                        // إجابة خاطئة: عرض أيقونة الخطأ وتشغيل صوت خطأ
+                        resultIcon.src = 'images/wrong.png';
+                        resultIcon.style.display = 'block';
+                        playSoundSafe('sounds/wrong.mp3');
+
+                        // إخفاء أيقونة الخطأ بعد فترة قصيرة (بدون تغيير الحالة)
+                        setTimeout(() => {
+                            resultIcon.style.display = 'none';
+                        }, 1400);
+                    }
+                };
+            }
+
+            /* ===== تحديث النجوم حسب عدد الإجابات الصحيحة =====
+                   أول نجمة تتحول بعد 3 إجابات صحيحة (نحو 1..3 => بعد 3)
+                   الثانية بعد 6 إجابات صحيحة
+                   الثالثة بعد 9 إجابات صحيحة
+            */
+
+            // ✅ دالة موحدة لتحريك النجوم
+            function animateStar(starEl) {
+                starEl.style.transform = 'translateX(15px) scale(1.25)'; // حركة النجمة
+                setTimeout(() => {
+                    starEl.style.transform = ''; // إرجاعها لمكانها
+                }, 250);
+            }
+
+
+            function updateStarsByProgress() {
+                // التغيير يتم فقط عند كل 3 إجابات صحيحة
+                if (correctAnswers % 3 === 0) {
+                    const index = (correctAnswers / 3) - 1; // 0 عند 3، 1 عند 6، 2 عند 9
+                    if (index >= 0 && index < starElems.length) {
+                        const starEl = starElems[index];
+                        if (!starEl.dataset.activated) {
+                            starEl.src = 'images/star_red.png'; // نجمة حمراء
+                            starEl.dataset.activated = '1';
+
+                            animateStar(starEl); // ✅ استدعاء الحركة الموحدة
+
+                        }
+                    }
+                }
+            }
+
+
+
+
+            /* ===== إعادة تهيئة النشاط (زر إعادة التشغيل) ===== */
+            function resetActivity() {
+                // إعادة العداد وتهيئة النجوم للصور الابتدائية
+                correctAnswers = 0;
+                for (let i = 0; i < starElems.length; i++) {
+                    starElems[i].src = initialStarSrc[i]; // إعادة الصورة الأصلية
+                    delete starElems[i].dataset.activated; // إزالة الوسم
+                    starElems[i].style.transform = '';
+                }
+                // إعادة سؤال جديد
+                showNewQuestion();
+            }
+
+            /* دالة مساعدة لتشغيل الأصوات مع تجاهل الأخطاء إن لم تتوفر الملفات */
+            function playSoundSafe(src) {
+                try {
+                    const a = new Audio(src);
+                    a.play().catch(() => { /* تجاهل خطأ التشغيل */ });
+                } catch (e) { }
+            }
+
+            // اختياري: لو حبيت تفعل إعادة تهيئة عند تحميل الصفحة (حالياً لا نفعل)
+            // resetActivity();
+
+        }); // end DOMContentLoaded
+
+        // منع قائمة كليك يمين كما في النشاط الأول
+        document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    </script>
+
+</body>
+
+</html>

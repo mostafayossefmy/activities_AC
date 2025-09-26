@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تحليل الكلمات - كامل</title>
+
+  <style>
+    :root {
+      --display-box-width: 460px;
+      --display-box-height: 120px;
+      --letter-size: 55px;
+      --main-font-family: 'NotoSansArabic_Condensed-Bold', Arial, sans-serif;
+    }
+
+    @font-face {
+      font-family: 'NotoSansArabic_Condensed-Bold';
+      src: url('fonts/NotoSansArabic_Condensed-Bold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('images/back_a_img.png') no-repeat center center;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--main-font-family);
+      direction: rtl;
+    }
+
+    .activity-container {
+      width: 100%;
+      max-width: 1000px;
+      height: 80vh;
+      max-height: 800px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      overflow: visible;
+    }
+
+    .sidebar {
+      width: 15%;
+      background: #f3e8ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      padding: 15px 10px;
+      border-top-right-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+
+    .row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .stars img {
+      width: 30px;
+      height: 30px;
+      transition: transform .25s ease, filter .25s ease;
+    }
+
+    .stars img:nth-child(2) {
+      transform: translateY(-6px);
+    }
+
+    .child-photo img {
+      width: 110px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .student-name {
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .student-name p {
+      margin: 0;
+      font-size: 16px;
+      font-weight: bold;
+      background: #fff;
+      border-radius: 12px;
+      padding: 6px 12px;
+      display: inline-block;
+
+      /* ✅ منع الالتفاف على سطر جديد */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* يظهر ... إذا الاسم طويل جدًا */
+    }
+
+    .timer img {
+      width: 80px;
+      height: 100px;
+      object-fit: contain;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      width: 100%;
+    }
+
+    .controls .right {
+      order: 1;
+    }
+
+    .controls .left {
+      order: 2;
+    }
+
+    .controls img {
+      width: 55px;
+      height: 55px;
+      cursor: pointer;
+      transition: transform .15s ease;
+    }
+
+    .controls img:hover {
+      transform: scale(1.08);
+    }
+
+    .activity-content {
+      width: 85%;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      position: relative;
+    }
+
+    .activity-label {
+      position: absolute;
+      top: 10px;
+      left: -45px;
+      width: 180px;
+      transform: rotate(-40deg);
+      z-index: 5;
+    }
+
+    .word-display {
+      font-size: 48px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .analysis-area {
+      width: var(--display-box-width);
+      height: var(--display-box-height);
+      background: #ffffcc;
+      border: 10px solid #ff9966;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #0015fc;
+      flex-wrap: wrap;
+      transition: box-shadow 0.3s ease;
+      letter-spacing: 5px;
+    }
+
+    .analysis-area.correct-letter {
+      box-shadow: 0 0 15px 6px yellow;
+    }
+
+    .glowing-box {
+      animation: correctGlow 0.8s ease-in-out 2;
+    }
+
+    @keyframes correctGlow {
+      0% {
+        box-shadow: 0 0 0 #4CAF50;
+      }
+
+      50% {
+        box-shadow: 0 0 25px 8px #4CAF50;
+      }
+
+      100% {
+        box-shadow: 0 0 0 #4CAF50;
+      }
+    }
+
+    .letters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      max-width: 635px;
+      margin-top: 10px;
+      direction: rtl;
+    }
+
+    .letter {
+      width: 50px;
+      height: 50px;
+      background: url('images/back_letter.png') no-repeat center center;
+      background-size: cover;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: transform .15s ease;
+    }
+
+    .letter:active {
+      transform: scale(1.05);
+      cursor: grabbing;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="activity-container">
+    <div class="sidebar">
+      <div class="row stars">
+        <img id="star1" src="images/star1.png" alt="نجمة1">
+        <img id="star2" src="images/star2.png" alt="نجمة2">
+        <img id="star3" src="images/star3.png" alt="نجمة3">
+      </div>
+
+      <div class="row child-photo">
+        <img src="images/child_photo.png" alt="صورة الطفل" id="userPhoto">
+      </div>
+      <div class="row student-name">
+        <p id="userNameDisplay">أحمد محمد</p>
+      </div>
+
+
+
+      <div class="row timer"><img id="timerImage" src="images/timer.png" alt="مؤقت"></div>
+      <div class="row controls">
+        <div class="right"><img id="homeBtn" src="images/home.png" alt="الرئيسية"></div>
+        <div class="left"><img id="retryBtn" src="images/retry.png" alt="إعادة"></div>
+      </div>
+    </div>
+
+    <div class="activity-content">
+      <img class="activity-label" src="images/actv_3.png" alt="لوجو النشاط">
+      <div id="wordDisplay" class="word-display"></div>
+      <div id="analysisArea" class="analysis-area"></div>
+      <div class="letters" id="lettersGrid"></div>
+    </div>
+  </div>
+
+  <script>
+
+    const storedName = sessionStorage.getItem('userName');
+    const storedPhoto = sessionStorage.getItem('userImage');
+
+    if (storedName) document.getElementById('userNameDisplay').textContent = storedName;
+    if (storedPhoto) document.getElementById('userPhoto').src = storedPhoto;
+
+
+
+    /* ----- مجموعة الكلمات (قابلة للتعديل بسهولة) ----- */
+    const words = [
+      { word: "أسد", letters: ['أ', 'س', 'د'], shaped: ['أ', 'سـ', 'د'] },
+      { word: "جزر", letters: ['ج', 'ز', 'ر'], shaped: ['جـ', 'ز', 'ر'] },
+      { word: "ولد", letters: ['و', 'ل', 'د'], shaped: ['و', 'لـ', 'د'] },
+      { word: "بنت", letters: ['ب', 'ن', 'ت'], shaped: ['بـ', 'نـ', 'ت'] },
+      { word: "عنب", letters: ['ع', 'ن', 'ب'], shaped: ['عـ', 'نـ', 'ب'] },
+      { word: "جمل", letters: ['ج', 'م', 'ل'], shaped: ['جـ', 'مـ', 'ل'] },
+      { word: "زرع", letters: ['ز', 'ر', 'ع'], shaped: ['ز', 'ر', 'ع'] },
+      { word: "سوق", letters: ['س', 'و', 'ق'], shaped: ['سـ', 'و', 'ق'] },
+      { word: "طفل", letters: ['ط', 'ف', 'ل'], shaped: ['طـ', 'فـ', 'ل'] },
+      { word: "فيل", letters: ['ف', 'ي', 'ل'], shaped: ['فـ', 'يـ', 'ل'] },
+      { word: "قلم", letters: ['ق', 'ل', 'م'], shaped: ['قـ', 'لـ', 'م'] },
+      { word: "قمر", letters: ['ق', 'م', 'ر'], shaped: ['قـ', 'مـ', 'ر'] },
+      { word: "ورق", letters: ['و', 'ر', 'ق'], shaped: ['و', 'ر', 'ق'] },
+      { word: "مركب", letters: ['م', 'ر', 'ك', 'ب'], shaped: ['مـ', 'ر', 'كـ', 'ب'] },
+      { word: "مترو", letters: ['م', 'ت', 'ر', 'و'], shaped: ['مـ', 'تـ', 'ر', 'و'] },
+      { word: "بطة", letters: ['ب', 'ط', 'ة'], shaped: ['بـ', 'طـ', 'ـة'] },
+      { word: "دب", letters: ['د', 'ب'], shaped: ['د', 'ب'] },
+      { word: "شمس", letters: ['ش', 'م', 'س'], shaped: ['شـ', 'مـ', 'س'] },
+      { word: "قطة", letters: ['ق', 'ط', 'ة'], shaped: ['قـ', 'طـ', 'ـة'] },
+      { word: "خس", letters: ['خ', 'س'], shaped: ['خـ', 'س'] },
+      { word: "سمكة", letters: ['س', 'م', 'ك', 'ة'], shaped: ['سـ', 'مـ', 'كـ', 'ـة'] },
+      { word: "كرسي", letters: ['ك', 'ر', 'س', 'ي'], shaped: ['كـ', 'ر', 'سـ', 'ي'] },
+      { word: "شورت", letters: ['ش', 'و', 'ر', 'ت'], shaped: ['شـ', 'و', 'ر', 'ت'] }, // مثال (تعديل إذا لزم)
+      { word: "خروف", letters: ['خ', 'ر', 'و', 'ف'], shaped: ['خـ', 'ر', 'و', 'ف'] },
+      { word: "أرنب", letters: ['أ', 'ر', 'ن', 'ب'], shaped: ['أ', 'ر', 'نـ', 'ب'] },
+      { word: "بحر", letters: ['ب', 'ح', 'ر'], shaped: ['بـ', 'حـ', 'ر'] },
+      { word: "ورد", letters: ['و', 'ر', 'د'], shaped: ['و', 'ر', 'د'] },
+      { word: "توت", letters: ['ت', 'و', 'ت'], shaped: ['تـ', 'و', 'ت'] },
+      { word: "فلفل", letters: ['ف', 'ل', 'ف', 'ل'], shaped: ['فـ', 'لـ', 'فـ', 'ل'] },
+      { word: "ديك", letters: ['د', 'ي', 'ك'], shaped: ['د', 'يـ', 'ك'] },
+      { word: "قرد", letters: ['ق', 'ر', 'د'], shaped: ['قـ', 'ر', 'د'] },
+      { word: "كلب", letters: ['ك', 'ل', 'ب'], shaped: ['كـ', 'لـ', 'ب'] },
+      { word: "نمر", letters: ['ن', 'م', 'ر'], shaped: ['نـ', 'مـ', 'ر'] }
+    ];
+
+    /* ----- الحروف المتاحة للسحب ----- */
+    const arabicLetters = ['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'هـ', 'ة', 'و', 'ي'];
+
+    let currentWord = {}, currentWordIndex = 0, placedLetters = [], correctAnswers = 0;
+    const starElems = [], initialStarSrc = ['images/star1.png', 'images/star2.png', 'images/star3.png'], highlightStarSrc = 'images/star_red.png';
+    let dropAreaEl = null;
+
+    function playSoundSafe(src) { try { new Audio(src).play().catch(() => { }); } catch (e) { } }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      dropAreaEl = document.getElementById('analysisArea');
+      const lettersGrid = document.getElementById('lettersGrid');
+      const homeBtn = document.getElementById('homeBtn');
+      const retryBtn = document.getElementById('retryBtn');
+
+      starElems.push(document.getElementById('star1'));
+      starElems.push(document.getElementById('star2'));
+      starElems.push(document.getElementById('star3'));
+
+      if (homeBtn) homeBtn.addEventListener('click', () => window.location.href = 'activities.html');
+      if (retryBtn) retryBtn.addEventListener('click', resetActivity);
+
+      dropAreaEl.addEventListener('dragover', e => e.preventDefault());
+      dropAreaEl.addEventListener('drop', handleDrop);
+
+      setupNewWord();
+    });
+
+    function setupNewWord() {
+      currentWordIndex = Math.floor(Math.random() * words.length);
+      currentWord = words[currentWordIndex];
+      placedLetters = [];
+      document.getElementById('wordDisplay').textContent = currentWord.word;
+      dropAreaEl.textContent = '';
+
+      const grid = document.getElementById('lettersGrid');
+      grid.innerHTML = '';
+      arabicLetters.forEach(letter => {
+        const div = document.createElement('div');
+        div.className = 'letter';
+        div.textContent = letter;
+        div.draggable = true;
+        div.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', letter));
+        grid.appendChild(div);
+      });
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const droppedLetter = e.dataTransfer.getData('text/plain');
+      if (!droppedLetter) return;
+      const expectedLetter = currentWord.letters[placedLetters.length];
+
+      if (droppedLetter === expectedLetter) {
+        placedLetters.push(droppedLetter);
+
+        // عرض الحروف بشكل مشكل
+        const shapedLetters = currentWord.shaped.slice(0, placedLetters.length);
+        dropAreaEl.textContent = shapedLetters.join(' - ');
+
+        // توهج أصفر مؤقت عند كل حرف
+        dropAreaEl.classList.add('correct-letter');
+        setTimeout(() => dropAreaEl.classList.remove('correct-letter'), 500);
+
+        playSoundSafe('sounds/correct.mp3');
+
+        if (placedLetters.length === currentWord.letters.length) {
+          playSoundSafe(`sounds/word${currentWordIndex + 1}.mp3`);
+
+          // توهج أخضر مرتين عند اكتمال الكلمة
+          dropAreaEl.classList.add('glowing-box');
+          correctAnswers++;                  // زيادة الإجابات الصحيحة
+          updateSidebarStarsByProgress();    // ← **هنا** استدعاء الدالة لتحديث النجوم
+
+          setTimeout(() => {
+            dropAreaEl.classList.remove('glowing-box');
+            setupNewWord();
+          }, 1800);
+        }
+
+      } else {
+        playSoundSafe('sounds/wrong.mp3');
+      }
+    }
+
+
+    // ✅ دالة موحدة لتحريك النجوم
+    function animateStar(starEl) {
+      starEl.style.transform = 'translateX(15px) scale(1.25)'; // حركة النجمة
+      setTimeout(() => {
+        starEl.style.transform = ''; // إرجاعها لمكانها
+      }, 250);
+    }
+
+
+    /* ===== تحويل نجوم العمود إلى حمراء طبقًا للتقدم: 3 / 6 / 9 ===== */
+    function updateSidebarStarsByProgress() {
+      // عتبات التغيير
+      const thresholds = [3, 6, 9];
+
+      thresholds.forEach((t, idx) => {
+        if (correctAnswers >= t && starElems[idx] && !starElems[idx].dataset.activated) {
+          starElems[idx].src = highlightStarSrc;
+          starElems[idx].dataset.activated = '1';
+
+          animateStar(starElems[idx]);  // ✅ استدعاء الحركة الموحدة
+        }
+      });
+    }
+
+
+
+
+
+    function resetActivity() {
+      correctAnswers = 0;
+      starElems.forEach((s, i) => {
+        s.src = initialStarSrc[i] || 'images/star1.png';
+        delete s.dataset.activated;
+        s.style.transform = '';
+      });
+      setupNewWord();
+    }
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+
+</html>

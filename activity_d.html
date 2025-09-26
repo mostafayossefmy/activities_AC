@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>تكوين الكلمات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ✅ إدخال الخط */
+        @font-face {
+            font-family: 'NotoSansArabic_Condensed-Bold';
+            src: url('fonts/NotoSansArabic_Condensed-Bold.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('images/back_a_img.png') no-repeat center center;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'NotoSansArabic_Condensed-Bold', sans-serif;
+            overflow: hidden;
+        }
+
+        .activity-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            max-height: 800px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ===== العمود الجانبي ===== */
+        .sidebar {
+            width: 16%;
+            background: #f3e8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 15px 10px;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            box-sizing: border-box;
+            height: 100%;
+        }
+
+        .sidebar .row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* ⭐ الصف 1: النجوم (الوسطى مرتفعة جمالياً) */
+        .stars {
+            direction: rtl;
+            /* 👈 فرض الاتجاه من اليمين */
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .stars img {
+            width: 30px;
+            height: 30px;
+            transition: transform .25s ease, filter .25s ease;
+        }
+
+        .stars img:nth-child(2) {
+            transform: translateY(-6px);
+        }
+
+        /* ✍️ الصف 3: اسم الطالب */
+        .child-photo img {
+            width: 110px;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        .student-name {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* ✍️ الصف 3: اسم الطالب */
+        .student-name p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            background: #fff;
+            border-radius: 12px;
+            padding: 6px 12px;
+            display: inline-block;
+
+            /* ✅ منع الالتفاف على سطر جديد */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* يظهر ... إذا الاسم طويل جدًا */
+        }
+
+        /* ⏱️ الصف 4: المؤقت */
+        .timer img {
+            width: 80px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        /* 🏠🔄 الصف 5: التحكم (هوم على اليمين، ريست على اليسار) */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .controls .right {
+            order: 2;
+        }
+
+        /* الهوم يمين */
+        .controls .left {
+            order: 1;
+        }
+
+        /* إعادة التشغيل يسار */
+        .controls img {
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .controls img:hover {
+            transform: scale(1.08);
+        }
+
+        /* ===== منطقة النشاط ===== */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            height: 100%;
+            position: relative;
+        }
+
+        .activity-label {
+            position: absolute;
+            top: 10px;
+            left: -45px;
+            width: 180px;
+            transform: rotate(-40deg);
+        }
+
+        .image-box {
+            width: 220px;
+            height: 220px;
+            background-image: url("images/back_img.png");
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-box img {
+            max-width: 180px;
+            max-height: 180px;
+        }
+
+        .word-drop-zone {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+            width: 90%;
+            max-width: 400px;
+            background: #ffffcc;
+            border: 10px solid #ff9966;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #2a06f5;
+            direction: rtl;
+            font-family: 'NotoSansArabic_Condensed-Bold', sans-serif;
+            transition: box-shadow 0.5s ease-in-out;
+        }
+
+        .letters-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            direction: rtl;
+        }
+
+        .letter {
+            width: 55px;
+            height: 55px;
+            background-image: url("images/back_letter.png");
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-family: 'NotoSansArabic_Condensed-Bold', sans-serif;
+        }
+
+        .letter:hover {
+            transform: scale(1.1);
+        }
+
+        .glowing-box {
+            animation: correctGlow 1.5s ease-in-out 2;
+        }
+
+        @keyframes correctGlow {
+            0% {
+                box-shadow: 0 0 0 #4CAF50;
+            }
+
+            50% {
+                box-shadow: 0 0 25px 8px #4CAF50;
+            }
+
+            100% {
+                box-shadow: 0 0 0 #4CAF50;
+            }
+        }
+
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('images/star.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0;
+            animation: star-fly 4s forwards;
+            z-index: 10;
+        }
+
+        @keyframes star-fly {
+            0% {
+                transform: translate(0, 0) scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--end-x), var(--end-y)) scale(0.1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="activity-container">
+        <!-- ✅ العمود الجانبي -->
+        <div class="sidebar">
+            <div class="row stars">
+                <!-- ✅ صور النجوم هتتغير مع التقدم -->
+                <img id="star1" src="images/star1.png" alt="نجمة 1"> <!-- نجمة 1 افتراضية -->
+                <img id="star2" src="images/star2.png" alt="نجمة 2"> <!-- نجمة 2 افتراضية -->
+                <img id="star3" src="images/star3.png" alt="نجمة 3"> <!-- نجمة 3 افتراضية -->
+            </div>
+
+
+            <div class="row child-photo">
+                <img id="childPhoto" src="images/child_photo.png" alt="صورة الطفل"> <!-- ✅ إضافة id -->
+            </div>
+
+            <div class="row student-name">
+                <p id="studentName">أحمد محمد</p> <!-- ✅ إضافة id -->
+            </div>
+
+
+
+            <div class="row timer">
+                <img src="images/timer.png" alt="مؤقت">
+            </div>
+            <div class="row controls">
+                <!-- ✅ زر الهوم -->
+                <div class="right"><img id="homeBtn" src="images/home.png" alt="الرئيسية"></div>
+                <!-- ✅ زر إعادة -->
+                <div class="left"><img id="retryBtn" src="images/retry.png" alt="إعادة"></div>
+            </div>
+        </div>
+
+        <!-- ✅ منطقة النشاط -->
+        <div class="content-area">
+            <img src="images/actv_4.png" class="activity-label" alt="نشاط 4">
+            <div class="image-box">
+                <img id="wordImage" src="" alt="صورة الكلمة">
+            </div>
+            <div class="word-drop-zone" id="wordDropZone"></div>
+            <div class="letters-grid" id="lettersGrid"></div>
+
+            <!-- الأصوات -->
+            <audio id="correctSound" src="sounds/correct.mp3"></audio>
+            <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+            <audio id="applauseSound" src="sounds/clap.mp3"></audio>
+        </div>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // ✅ عرض اسم وصورة المستخدم من شاشة البيانات
+            const storedName = sessionStorage.getItem('userName');
+            const storedImage = sessionStorage.getItem('userImage');
+
+            if (storedName) {
+                document.getElementById('studentName').textContent = storedName;
+            }
+
+            if (storedImage) {
+                document.getElementById('childPhoto').src = storedImage;
+            }
+        });
+
+
+
+
+
+        const words = [
+            { id: 1, word: "فيل", letters: ['ف', 'ي', 'ل'] },
+            { id: 2, word: "أسد", letters: ['أ', 'س', 'د'] },
+            { id: 3, word: "قلم", letters: ['ق', 'ل', 'م'] },
+            { id: 4, word: "مركب", letters: ['م', 'ر', 'ك', 'ب'] },
+            { id: 5, word: "نمر", letters: ['ن', 'م', 'ر'] },
+            { id: 6, word: "ديك", letters: ['د', 'ي', 'ك'] },
+            { id: 7, word: "طائرة", letters: ['ط', 'ا', 'ئ', 'ر', 'ة'] },
+            { id: 8, word: "قمر", letters: ['ق', 'م', 'ر'] },
+            { id: 9, word: "سمكة", letters: ['س', 'م', 'ك', 'ة'] },
+            { id: 10, word: "فستان", letters: ['ف', 'س', 'ت', 'ا', 'ن'] },
+            { id: 11, word: "قطة", letters: ['ق', 'ط', 'ة'] },
+            { id: 12, word: "كتاب", letters: ['ك', 'ت', 'ا', 'ب'] },
+            { id: 13, word: "بيت", letters: ['ب', 'ي', 'ت'] },
+            { id: 14, word: "ولد", letters: ['و', 'ل', 'د'] },
+            { id: 15, word: "عنب", letters: ['ع', 'ن', 'ب'] },
+            { id: 16, word: "جزر", letters: ['ج', 'ز', 'ر'] },
+            { id: 17, word: "تفاح", letters: ['ت', 'ف', 'ا', 'ح'] },
+            { id: 18, word: "موز", letters: ['م', 'و', 'ز'] },
+            { id: 19, word: "دب", letters: ['د', 'ب'] },
+            { id: 20, word: "رمان", letters: ['ر', 'م', 'ا', 'ن'] }
+        ];
+
+        let currentWord = {};
+        let placedLetters = [];
+        let correctAnswers = 0; // ✅ عداد للإجابات الصحيحة
+
+        document.addEventListener('DOMContentLoaded', startNewRound);
+
+        // ✅ زر إعادة التشغيل
+        document.getElementById('retryBtn').addEventListener('click', () => {
+            correctAnswers = 0; // إعادة العداد
+            resetStars();
+            startNewRound();
+        });
+
+        // ✅ زر الهوم (ممكن يخليك يفتح صفحة رئيسية أو يرجعك main.html)
+        document.getElementById('homeBtn').addEventListener('click', () => {
+            window.location.href = "activities.html"; // غيّرها للمسار الصحيح
+        });
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startNewRound() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('wordImage').src = `images/word_photo${currentWord.id}.png`;
+
+            placedLetters = [];
+
+            const lettersGrid = document.getElementById('lettersGrid');
+            lettersGrid.innerHTML = '';
+
+            const wordDropZone = document.getElementById('wordDropZone');
+            wordDropZone.textContent = '';
+            wordDropZone.style.boxShadow = '';
+            wordDropZone.classList.remove('glowing-box');
+
+            const shuffledLetters = shuffle([...currentWord.letters]);
+            shuffledLetters.forEach(letter => {
+                const letterDiv = document.createElement('div');
+                letterDiv.textContent = letter;
+                letterDiv.classList.add('letter');
+                letterDiv.draggable = true;
+                letterDiv.id = `draggable-${letter}-${Math.random().toString(36).substr(2, 5)}`;
+                letterDiv.addEventListener('dragstart', dragStart);
+                lettersGrid.appendChild(letterDiv);
+            });
+
+            setupDropZone();
+        }
+
+        function dragStart(event) {
+            event.dataTransfer.setData('text/plain', event.target.textContent);
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('wordDropZone');
+            dropZone.addEventListener('dragover', dragOver);
+            dropZone.addEventListener('drop', drop);
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const droppedLetter = event.dataTransfer.getData('text/plain');
+            const nextCorrectLetter = currentWord.letters[placedLetters.length];
+
+            if (droppedLetter === nextCorrectLetter) {
+                placedLetters.push(droppedLetter);
+                document.getElementById('correctSound').play();
+                document.getElementById('wordDropZone').textContent = placedLetters.join('');
+                const allLetters = document.querySelectorAll('.letter');
+                allLetters.forEach(el => {
+                    if (el.textContent === droppedLetter) el.remove();
+                });
+                document.getElementById('wordDropZone').style.boxShadow = '0 0 15px 5px #ffeb3b';
+                setTimeout(() => {
+                    document.getElementById('wordDropZone').style.boxShadow = '';
+                }, 500);
+
+                checkCompletion();
+            } else {
+                document.getElementById('wrongSound').play();
+            }
+        }
+
+        function checkCompletion() {
+            if (placedLetters.length === currentWord.letters.length) {
+                document.getElementById('applauseSound').play();
+                const dropZone = document.getElementById('wordDropZone');
+                dropZone.classList.add('glowing-box');
+                createFlyingStars();
+
+                // ✅ تحديث عداد الإجابات الصحيحة
+                correctAnswers++;
+                updateStars();
+
+                setTimeout(startNewRound, 4000);
+            }
+        }
+
+
+        // ✅ دالة موحدة لتحريك النجوم
+        function animateStar(starEl) {
+            starEl.style.transform = 'translateX(15px) scale(1.25)'; // حركة من الشمال
+            setTimeout(() => {
+                starEl.style.transform = ''; // ترجع لمكانها
+            }, 250);
+        }
+
+
+
+        // ✅ تغيير النجوم بعد 3 ثم 6 ثم 9
+        function updateStars() {
+            if (correctAnswers === 3) {
+                const star = document.getElementById('star1');
+                star.src = "images/star_red.png";
+                animateStar(star); // ✅ إضافة الحركة
+            } else if (correctAnswers === 6) {
+                const star = document.getElementById('star2');
+                star.src = "images/star_red.png";
+                animateStar(star); // ✅ إضافة الحركة
+            } else if (correctAnswers === 9) {
+                const star = document.getElementById('star3');
+                star.src = "images/star_red.png";
+                animateStar(star); // ✅ إضافة الحركة
+            }
+        }
+
+
+        // ✅ إعادة النجوم عند الضغط على إعادة
+        function resetStars() {
+            document.getElementById('star1').src = "images/star1.png";
+            document.getElementById('star2').src = "images/star2.png";
+            document.getElementById('star3').src = "images/star3.png";
+        }
+        function createFlyingStars() {
+            const imageBox = document.querySelector('.image-box');
+            const numStars = 15;
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                const size = Math.random() * 20 + 10;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                const startX = imageBox.offsetLeft + imageBox.offsetWidth / 2 - size / 2;
+                const startY = imageBox.offsetTop;
+                star.style.left = `${startX}px`;
+                star.style.top = `${startY}px`;
+
+                const endX = startX + (Math.random() - 0.5) * 400;
+                const endY = startY - 500;
+
+                star.style.setProperty('--end-x', `${endX - startX}px`);
+                star.style.setProperty('--end-y', `${endY - startY}px`);
+
+                document.body.appendChild(star);
+                setTimeout(() => { star.remove(); }, 4000);
+            }
+        }
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
+</body>
+
+</html>
