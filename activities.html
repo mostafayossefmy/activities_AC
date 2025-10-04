@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+  <meta charset="UTF-8">
+  <title>أنشطة الحروف العربية</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('images/backactivities_img.png') no-repeat center center;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .main-container {
+      width: 90%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      position: relative;
+    }
+
+    .page-title {
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .activities-container {
+      width: 90%;
+      max-width: 1100px;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 50px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .activity-card {
+      transition: transform 0.3s ease-in-out;
+      cursor: pointer;
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .activity-card:hover {
+      transform: scale(1.1);
+    }
+
+    .card-image {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      border-radius: 0;
+      box-shadow: none;
+      background: none;
+    }
+
+    .card-title-box {
+      background-color: #ff6b6b;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 25px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    /* 🔹 زر الخروج */
+    .exit-btn {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    /* 🔹 النافذة المنبثقة */
+    .confirm-exit {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+    }
+
+    .confirm-exit.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .confirm-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      animation: popIn 0.4s ease;
+    }
+
+    .confirm-box p {
+      width: 300px;
+      height: 40px;
+      font-size: 1.5rem;
+      margin-bottom: 60px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .confirm-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+    }
+
+    .confirm-buttons img {
+      width: 70px;
+      height: 70px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .confirm-buttons img:hover {
+      transform: scale(1.2);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.7);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* ===== Media Queries للشاشات الصغيرة ===== */
+    @media (max-width: 768px) {
+      .activities-container {
+        gap: 30px;
+        padding: 30px;
+      }
+
+      .card-image {
+        width: 180px;
+        height: 180px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .activities-container {
+        gap: 20px;
+        padding: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .card-image {
+        width: 140px;
+        height: 140px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <h1 class="page-title">أنشطتنا الجميلة</h1>
+
+    <div class="activities-container">
+      <!-- زر الخروج -->
+      <img src="images/exit.png" class="exit-btn" id="exitBtn" alt="خروج">
+
+      <!-- أيقونات الأنشطة -->
+      <a href="activity_a.html" class="activity-card">
+        <img src="images/icon_a.png" class="card-image" alt="نشاط التعرف على الحروف">
+        <div class="card-title-box">التعرف على الحروف</div>
+      </a>
+
+      <a href="activity_b.html" class="activity-card">
+        <img src="images/icon_b.png" class="card-image" alt="نشاط مطابقة الحروف">
+        <div class="card-title-box">مطابقة الحروف بالصورة</div>
+      </a>
+
+      <a href="activity_c.html" class="activity-card">
+        <img src="images/icon_c.png" class="card-image" alt="نشاط تحليل الكلمات">
+        <div class="card-title-box">تحليل الكلمات</div>
+      </a>
+
+      <a href="activity_d.html" class="activity-card">
+        <img src="images/icon_d.png" class="card-image" alt="نشاط كلمة وصورة">
+        <div class="card-title-box">تكوين الكلمات</div>
+      </a>
+
+      <a href="activity_e.html" class="activity-card">
+        <img src="images/icon_e.png" class="card-image" alt="نشاط اختيار الصورة">
+        <div class="card-title-box">البحث عن الحرف</div>
+      </a>
+
+      <a href="activity_f.html" class="activity-card">
+        <img src="images/icon_f.png" class="card-image" alt="نشاط عجلة الحروف">
+        <div class="card-title-box">الحرف الناقص</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- نافذة التأكيد -->
+  <div class="confirm-exit" id="confirmExit">
+    <div class="confirm-box">
+      <p>هل تريد الخروج من التطبيق؟</p>
+      <div class="confirm-buttons">
+        <img src="images/yes.png" alt="نعم" id="confirmYes">
+        <img src="images/no.png" alt="لا" id="confirmNo">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const exitBtn = document.getElementById('exitBtn');
+    const confirmExit = document.getElementById('confirmExit');
+    const confirmYes = document.getElementById('confirmYes');
+    const confirmNo = document.getElementById('confirmNo');
+
+  
+// تشغيل الأنيميشن عند الوقوف (hover)
+exitBtn.addEventListener('mouseenter', () => {
+  exitBtn.src = "images/exit_anim.gif";
+});
+
+// الرجوع إلى الصورة الثابتة عند الخروج بالماوس
+exitBtn.addEventListener('mouseleave', () => {
+  exitBtn.src = "images/exit.png";
+});
+
+// عند الضغط ➝ تظهر نافذة التأكيد فقط بدون حركة
+exitBtn.addEventListener('click', () => {
+  confirmExit.classList.add('show');
+});
+
+    // إذا اختار "نعم"
+    confirmYes.addEventListener('click', () => {
+        window.location.replace("exit.html");
+  //    window.location.href = "exit.html"; // الانتقال لصفحة الخروج
+    });
+
+    // إذا اختار "لا"
+    confirmNo.addEventListener('click', () => {
+      confirmExit.classList.remove('show'); // إخفاء النافذة
+    });
+
+    // منع قائمة كليك يمين
+    document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  </script>
+</body>
+
+</html>
