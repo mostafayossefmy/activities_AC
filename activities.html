@@ -1,164 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar">
-
-<head>
-    <title>أنشطة الحروف العربية</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            /*  background-color: #cc99ff; /* 🔹 لون خلفية الصفحة */
-            background: url('images/backactivities_img.png') no-repeat center center;
-            background-size: cover;
-            /* 🔹 دي أهم حاجة علشان الصورة تتمدد على مقاس الشاشة بالكامل */
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-        }
-
-
-        .main-container {
-            width: 90%;
-            max-width: 1000px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-        }
-
-        .page-title {
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: #333;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            display: none;
-            /* 🔹 يخفي العنوان (لو عايز يظهره شيل السطر ده) */
-        }
-
-        /* المربع الأبيض الأساسي اللي فيه الأنشطة */
-        .activities-container {
-            width: 90%;
-            /* 🔹 عرض المربع الأبيض (غيّره لتكبير/تصغير العرض) */
-            max-width: 1100px;
-            /* 🔹 أقصى عرض للمربع */
-            background: #ffffff;
-            /* 🔹 خلفية بيضاء */
-            padding: 40px;
-            /* 🔹 المسافة الداخلية (غيّرها لو عايز المربع يبقى أكبر أو أصغر من الداخل) */
-            border-radius: 20px;
-            /* 🔹 درجة تدوير الحواف */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            /* 🔹 ظل المربع */
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            /* 🔹 عدد الأعمدة (220px أقل عرض للأيقونة) */
-            gap: 50px;
-            /* 🔹 المسافة بين الأيقونات */
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* كل أيقونة للنشاط */
-        .activity-card {
-            transition: transform 0.3s ease-in-out;
-            cursor: pointer;
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .activity-card:hover {
-            transform: scale(1.1);
-            /* 🔹 تأثير التكبير عند المرور */
-        }
-
-        /* الأيقونات (الصور) بدون خلفية */
-        .card-image {
-            width: 220px;
-            /* 🔹 عرض الأيقونة (غيّره لتكبير/تصغير) */
-            height: 220px;
-            /* 🔹 ارتفاع الأيقونة */
-            object-fit: contain;
-            /* 🔹 يحافظ على نسبة أبعاد الصورة */
-            border-radius: 0;
-            /* 🔹 بدون حواف مستديرة */
-            box-shadow: none;
-            /* 🔹 بدون ظل */
-            background: none;
-            /* 🔹 بدون خلفية */
-        }
-
-        /* النص أسفل الأيقونة (مخفي حاليًا) */
-        .card-title-box {
-            background-color: #ff6b6b;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 25px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: none;
-            /* 🔹 لو عايز يظهر النص تحت الأيقونة شيل كلمة none */
-        }
-    </style>
-</head>
-
-<body>
-    <div class="main-container">
-        <h1 class="page-title"> أنشطتنا الجميلة</h1>
-
-        <!-- 🔹 المربع الأبيض اللي فيه 6 أنشطة -->
-        <div class="activities-container">
-
-            <a href="activity_a.html" class="activity-card">
-                <img src="images/icon_a.png" class="card-image" alt="نشاط التعرف على الحروف">
-                <div class="card-title-box">التعرف على الحروف</div>
-            </a>
-
-            <a href="activity_b.html" class="activity-card">
-                <img src="images/icon_b.png" class="card-image" alt="نشاط مطابقة الحروف">
-                <div class="card-title-box">مطابقة الحروف بالصورة</div>
-            </a>
-
-            <a href="activity_c.html" class="activity-card">
-                <img src="images/icon_c.png" class="card-image" alt="نشاط تحليل الكلمات">
-                <div class="card-title-box">تحليل الكلمات</div>
-            </a>
-
-            <a href="activity_d.html" class="activity-card">
-                <img src="images/icon_d.png" class="card-image" alt="نشاط كلمة وصورة">
-                <div class="card-title-box">تكوين الكلمات </div>
-            </a>
-
-            <a href="activity_e.html" class="activity-card">
-                <img src="images/icon_e.png" class="card-image" alt="نشاط اختيار الصورة">
-                <div class="card-title-box"> البحث عن الحرف</div>
-            </a>
-
-            <a href="activity_f.html" class="activity-card">
-                <img src="images/icon_f.png" class="card-image" alt="نشاط عجلة الحروف">
-                <div class="card-title-box"> الحرف الناقص</div>
-            </a>
-
-        </div>
-    </div>
-    <script>
-
-        // منع قائمة كليك يمين كما في النشاطات السابقة
-        document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-    </script>
-
-
-</body>
-
-</html>
